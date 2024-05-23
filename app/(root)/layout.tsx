@@ -1,3 +1,4 @@
+import Sidebar from '@/components/shared/Sidebar'
 import React from 'react'
 
 interface Props{
@@ -7,6 +8,7 @@ interface Props{
 function layout({children}:Props) {
   return (
     <main className='root'>
+      <Sidebar />
         <div className="root-container">
             <div className="wrapper">
                 {children}
