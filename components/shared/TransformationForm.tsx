@@ -1,7 +1,15 @@
 "use client"
 
-import React from 'react'
+import React, { useState } from 'react'
 import { z } from "zod"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
@@ -15,18 +23,32 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { defaultValues, transformationTypes } from '@/constants'
+import { CustomField } from './CostomField'
  
-const formSchema = z.object({
-  username: z.string().min(2).max(50),
+export const formSchema = z.object({
+  title: z.string(),
+  aspectRatio: z.string().optional(),
+  color: z.string().optional(),
+  prompt: z.string().optional(),
+  publicId: z.string()
 })
 
-function TransformationForm() {
+function TransformationForm({action, data = null, userId, type, creditBalance}:TransformationFormProps) {
+  const transformationType = transformationTypes[type]
+  const [image, setImage] = useState(data)
+  const [] = useState<Transformations | null>(null)
+  const initialValues = data && action === "Update" ? {
+    title: data?.title,
+    aspectRatio: data?.aspectRatio,
+    color: data?.color,
+    prompt: data?.prompt,
+    publicId: data?.publicId,
+  }: defaultValues
     // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      username: "",
-    },
+    defaultValues: initialValues
   })
  
   // 2. Define a submit handler.
@@ -35,26 +57,28 @@ function TransformationForm() {
     // ✅ This will be type-safe and validated.
     console.log(values)
   }
+  function onSelectFieldHandler(value: string, onChangeField: (value: string)=>void){
+
+  }
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input placeholder="shadcn" {...field} />
-              </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Submit</Button>
+        <CustomField control={form.control} name="title" formLabel="Image Title" className="w-full" render={({field})=> <Input {...field} className='input-field' />} />
+        {type === "fill" && (
+          <CustomField control={form.control} name='aspectRatio' formLabel='Aspect Ratio' className="w-full" render={({field})=>(
+      <Select>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Theme" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="light">Light</SelectItem>
+            <SelectItem value="dark">Dark</SelectItem>
+            <SelectItem value="system">System</SelectItem>
+          </SelectContent>
+     </Select>
+
+          )} />
+        )}
       </form>
     </Form>
   )
