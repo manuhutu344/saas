@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react'
-import { z } from "zod"
+import { object, z } from "zod"
 import {
   Select,
   SelectContent,
@@ -23,8 +23,9 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { defaultValues, transformationTypes } from '@/constants'
+import { aspectRatioOptions, defaultValues, transformationTypes } from '@/constants'
 import { CustomField } from './CostomField'
+import { AspectRatioKey } from '@/lib/utils'
  
 export const formSchema = z.object({
   title: z.string(),
@@ -66,14 +67,18 @@ function TransformationForm({action, data = null, userId, type, creditBalance}:T
         <CustomField control={form.control} name="title" formLabel="Image Title" className="w-full" render={({field})=> <Input {...field} className='input-field' />} />
         {type === "fill" && (
           <CustomField control={form.control} name='aspectRatio' formLabel='Aspect Ratio' className="w-full" render={({field})=>(
-      <Select>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Theme" />
+      <Select
+      onValueChange={(value)=>onSelectFieldHandler(value, field.onchange)}
+      >
+          <SelectTrigger className="select-field">
+            <SelectValue placeholder="Pilih Ukurannya" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="light">Light</SelectItem>
-            <SelectItem value="dark">Dark</SelectItem>
-            <SelectItem value="system">System</SelectItem>
+            {Object.keys(aspectRatioOptions).map((key)=>(
+              <SelectItem key={key} value={key} className="select-item">
+                  {aspectRatioOptions[key as AspectRatioKey].label}
+              </SelectItem>
+            ))}
           </SelectContent>
      </Select>
 
