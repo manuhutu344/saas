@@ -61,6 +61,11 @@ function TransformationForm({action, data = null, userId, type, creditBalance}:T
   function onSelectFieldHandler(value: string, onChangeField: (value: string)=>void){
 
   }
+
+  function onInputChangeHandler(fieldName: string, value: string, type: string, onChangeField: (value: string)=>void){
+    
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -83,6 +88,20 @@ function TransformationForm({action, data = null, userId, type, creditBalance}:T
      </Select>
 
           )} />
+        )}
+        {(type === "remove" || type === "recolor") && (
+          <div className="prompt-field">
+              <CustomField control={form.control} name="prompt" formLabel={
+                type === "remove" ? "Object di hapus" : "Object di warnain ulang"
+              } className="w-full" render={(({field})=>(
+                <Input value={field.value} className="input-field" onChange={(e)=> onInputChangeHandler(
+                  'prompt',
+                  e.target.value,
+                  type,
+                  field.onChange
+                )} />
+              ))} />
+          </div>
         )}
       </form>
     </Form>
