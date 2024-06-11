@@ -101,8 +101,21 @@ function TransformationForm({action, data = null, userId, type, creditBalance}:T
                   field.onChange
                 )} />
               ))} />
+              {type === "recolor" && (
+                <CustomField control={form.control} name="color" formLabel="Warna Pengganti" className="w-full" render={({field})=>(
+                  <Input value={field.value} className="input-field" onChange={(e)=> onInputChangeHandler(
+                    'color',
+                    e.target.value,
+                    'recolor',
+                    field.onChange
+                  )} />
+                )}  />
+              )}
           </div>
         )}
+        <Button type="submit" className="submit-button capitalize">
+          Submit
+        </Button>
       </form>
     </Form>
   )
