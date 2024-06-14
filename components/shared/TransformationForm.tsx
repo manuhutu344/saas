@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useState } from 'react'
-import { object, z } from "zod"
+import React, { useState, useTransition } from 'react'
+import {  z } from "zod"
 import {
   Select,
   SelectContent,
@@ -23,9 +23,10 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { aspectRatioOptions, defaultValues, transformationTypes } from '@/constants'
+import { aspectRatioOptions, creditFee, defaultValues, transformationTypes } from '@/constants'
 import { CustomField } from './CostomField'
-import { AspectRatioKey } from '@/lib/utils'
+import { AspectRatioKey, debounce, deepMergeObjects } from '@/lib/utils'
+import { updateCredits } from '@/lib/actions/user.actions'
  
 export const formSchema = z.object({
   title: z.string(),
@@ -42,6 +43,7 @@ function TransformationForm({action, data = null, userId, type, creditBalance, c
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isTransforming, setIsTransforming] = useState(false)
   const [transformationConfig, setTransformationConfig] = useState(config)
+  const [isPending, startTransition] = useTransition()
   const initialValues = data && action === "Update" ? {
     title: data?.title,
     aspectRatio: data?.aspectRatio,
@@ -56,7 +58,7 @@ function TransformationForm({action, data = null, userId, type, creditBalance, c
   })
  
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values)
@@ -69,17 +71,34 @@ function TransformationForm({action, data = null, userId, type, creditBalance, c
         width: imageSizes.width,
         height: imageSizes.height
       }))
-      setNewTransformation(transformationType.config);
+      setNewTransformation(transformationType.config)
 
       return onChangeField(value)
   }
 
   function onInputChangeHandler(fieldName: string, value: string, type: string, onChangeField: (value: string)=>void){
-    
+    debounce(()=>{
+      setNewTransformation((prevState: any)=>({
+        ...prevState,
+        [type]:{
+          ...prevState?.[type],
+          [fieldName === "prompt" ? "prompt" : "to"]:
+          value
+        }
+      }))
+      return onChangeField(value)
+    }, 1000)
   }
 
-  function onTransformHandler(){
-
+  async function onTransformHandler(){
+    setIsTransforming(true)
+    setTransformationConfig(
+      deepMergeObjects(newTransformation, transformationConfig)
+    )
+    setNewTransformation(null)
+    startTransition(async()=>{
+      // await updateCredits(userId, creditFee)
+    })
   }
 
   return (
@@ -109,14 +128,14 @@ function TransformationForm({action, data = null, userId, type, creditBalance, c
           <div className="prompt-field">
               <CustomField control={form.control} name="prompt" formLabel={
                 type === "remove" ? "Object di hapus" : "Object di warnain ulang"
-              } className="w-full" render={(({field})=>(
+              } className="w-full" render={({field})=>(
                 <Input value={field.value} className="input-field" onChange={(e)=> onInputChangeHandler(
                   'prompt',
                   e.target.value,
                   type,
                   field.onChange
                 )} />
-              ))} />
+              )} />
               {type === "recolor" && (
                 <CustomField control={form.control} name="color" formLabel="Warna Pengganti" className="w-full" render={({field})=>(
                   <Input value={field.value} className="input-field" onChange={(e)=> onInputChangeHandler(
