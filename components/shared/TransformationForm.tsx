@@ -35,10 +35,13 @@ export const formSchema = z.object({
   publicId: z.string()
 })
 
-function TransformationForm({action, data = null, userId, type, creditBalance}:TransformationFormProps) {
+function TransformationForm({action, data = null, userId, type, creditBalance, config = null}:TransformationFormProps) {
   const transformationType = transformationTypes[type]
   const [image, setImage] = useState(data)
   const [newTransformation, setNewTransformation] = useState<Transformations | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isTransforming, setIsTransforming] = useState(false)
+  const [transformationConfig, setTransformationConfig] = useState(config)
   const initialValues = data && action === "Update" ? {
     title: data?.title,
     aspectRatio: data?.aspectRatio,
@@ -58,12 +61,25 @@ function TransformationForm({action, data = null, userId, type, creditBalance}:T
     // ✅ This will be type-safe and validated.
     console.log(values)
   }
-  function onSelectFieldHandler(value: string, onChangeField: (value: string)=>void){
+  function onSelectFieldHandler(value: string, onChangeField: (value: string) => void){
+      const imageSizes = aspectRatioOptions[value as AspectRatioKey]
+      setImage((prevState : any)=>({
+        ...prevState,
+        aspectRatio: imageSizes.aspectRatio,
+        width: imageSizes.width,
+        height: imageSizes.height
+      }))
+      setNewTransformation(transformationType.config);
 
+      return onChangeField(value)
   }
 
   function onInputChangeHandler(fieldName: string, value: string, type: string, onChangeField: (value: string)=>void){
     
+  }
+
+  function onTransformHandler(){
+
   }
 
   return (
@@ -113,9 +129,21 @@ function TransformationForm({action, data = null, userId, type, creditBalance}:T
               )}
           </div>
         )}
-        <Button type="submit" className="submit-button capitalize">
-          Submit
-        </Button>
+        <div className="flex flex-col gap-4">
+          <Button type="button" className="submit-button capitalize"
+            disabled={isTransforming || newTransformation
+                    === null
+            }
+            onClick={onTransformHandler}
+            >
+              {isTransforming ? "Transformasi..." : "Terapkan Transformasi"}
+            </Button>
+          <Button type="submit" className="submit-button capitalize"
+          disabled={isSubmitting}
+          >
+            {isSubmitting ? "Mengirimkan..." : "Simpan Gambar"}
+          </Button>
+        </div>
       </form>
     </Form>
   )
