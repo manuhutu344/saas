@@ -73,7 +73,7 @@ function TransformationForm({action, data = null, userId, type, creditBalance, c
       }))
       setNewTransformation(transformationType.config)
 
-      return onChangeField(value)
+      return onChangeField
   }
 
   function onInputChangeHandler(fieldName: string, value: string, type: string, onChangeField: (value: string)=>void){
