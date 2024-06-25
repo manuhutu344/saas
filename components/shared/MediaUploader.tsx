@@ -1,6 +1,11 @@
+"use client"
+
 import React from 'react'
 import { useToast } from "@/components/ui/use-toast"
-import {CldUploadWidget} from "next-cloudinary"
+import {CldImage, CldUploadWidget} from "next-cloudinary"
+import Image from 'next/image'
+import { dataUrl, getImageSize } from '@/lib/utils'
+import { PlaceholderValue } from 'next/dist/shared/lib/get-img-props'
 
 interface Props{
     onValueChange: (value: string) => void
@@ -13,6 +18,14 @@ interface Props{
 function MediaUploader({onValueChange, setImage, publicId, image, type}:Props) {
     const { toast } = useToast()
     function onUploadSuccessHandler(result: any){
+        setImage((prevState: any)=>({
+            ...prevState, 
+            publicId: result?.info?.public_id,
+            width: result?.info?.width,
+            height: result?.info?.height,
+            secureUrl: result?.info?.secure_url
+        }))
+        onValueChange(result?.info?.public_id)
         toast({
             title: "Gambar Berhasil Di Upload",
             description: "1 Credit Diambil",
@@ -40,11 +53,18 @@ function MediaUploader({onValueChange, setImage, publicId, image, type}:Props) {
                 </h3>
                 {publicId ?(
                     <>
-                        Ini Gambar
+                        <div className="cursor-pointer overflow-hidden rounded-[10px]">
+                            <CldImage width={getImageSize(type, image, "width")} height={getImageSize(type, image, "height")} src={publicId} alt='image' sizes={"(max-width: 767px) 100vw, 50vw"} placeholder={dataUrl as PlaceholderValue} className="media-uploader_cldImage" />
+                        </div>
                     </>
                 ):(
-                    <div>
-                        Ini Tidak Ada Gambar
+                    <div className="media-uploader_cta" onClick={()=>open()}>
+                        <div className="media-uploader_cta-image">
+                            <Image src="/assets/icons/add.svg" alt='Add Image' width={24} height={24}  />
+                        </div>
+                        <p className="p-14-medium">
+                            Click Disini Untuk Upload
+                        </p>
                     </div>
                 )}
             </div>
