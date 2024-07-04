@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useTransition } from 'react'
+import React, { useEffect, useState, useTransition } from 'react'
 import {  z } from "zod"
 import {
   Select,
@@ -160,6 +160,12 @@ function TransformationForm({action, data = null, userId, type, creditBalance, c
     await updateCredits(userId, creditFee)
     })
   }
+
+  useEffect(()=>{
+    if(image && (type === 'restore' || type === 'removeBackground')){
+      setNewTransformation(transformationType.config)
+    }
+  }, [image, transformationType.config, type])
 
   return (
     <Form {...form}>
