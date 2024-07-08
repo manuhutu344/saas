@@ -176,6 +176,7 @@ function TransformationForm({action, data = null, userId, type, creditBalance, c
           <CustomField control={form.control} name='aspectRatio' formLabel='Aspect Ratio' className="w-full" render={({field})=>(
       <Select
       onValueChange={(value)=>onSelectFieldHandler(value, field.onchange)}
+      value={field.value}
       >
           <SelectTrigger className="select-field">
             <SelectValue placeholder="Pilih Ukurannya" />
@@ -195,7 +196,8 @@ function TransformationForm({action, data = null, userId, type, creditBalance, c
           <div className="prompt-field">
               <CustomField control={form.control} name="prompt" formLabel={
                 type === "remove" ? "Object di hapus" : "Object di warnain ulang"
-              } className="w-full" render={({field})=>(
+              } className="w-full" 
+              render={({field})=>(
                 <Input value={field.value} className="input-field" onChange={(e)=> onInputChangeHandler(
                   'prompt',
                   e.target.value,

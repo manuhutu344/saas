@@ -1,12 +1,19 @@
-import { dataUrl, debounce, getImageSize } from '@/lib/utils'
-import { CldImage } from 'next-cloudinary'
+"use client"
+import { dataUrl, debounce, download, getImageSize } from '@/lib/utils'
+import { CldImage, getCldImageUrl } from 'next-cloudinary'
 import { PlaceholderValue } from 'next/dist/shared/lib/get-img-props'
 import Image from 'next/image'
 import React from 'react'
 
 function TransformedImage({image, type, title, transformationConfig, isTransforming, setIsTransforming, hasDownload = false}: TransformedImageProps) {
-    function downloadHandler(){
-
+    function downloadHandler(e: React.MouseEvent<HTMLButtonElement, MouseEvent>){
+        e.preventDefault()
+        download(getCldImageUrl({
+            width: image?.width,
+            height: image?.height,
+            src: image?.publicId,
+            ...transformationConfig
+        }), title)
     }
   return (
     <div className="flex flex-col gap-4">
@@ -27,13 +34,14 @@ function TransformedImage({image, type, title, transformationConfig, isTransform
                 }} onError={()=>{
                     debounce(()=>{
                         setIsTransforming && setIsTransforming(false)
-                    }, 8000)
+                    }, 8000)()
                 }} 
                 {...transformationConfig}
                 />
                 {isTransforming && (
                     <div className="transforming-loader">
-                        <Image src="assets/icons/soinner.svg" width={50} height={50} alt="Transforming" />
+                        <Image src="assets/icons/spinner.svg" width={50} height={50} alt="spinner" />
+                        <p className="text-white/80">Tolong Tunggu...</p>
                     </div>
                 )}
             </div>
