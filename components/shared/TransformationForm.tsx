@@ -146,8 +146,8 @@ function TransformationForm({action, data = null, userId, type, creditBalance, c
           value
         }
       }))
-      return onChangeField(value)
-    }, 1000)
+    }, 1000)()
+    return onChangeField(value)
   }
 
   async function onTransformHandler(){

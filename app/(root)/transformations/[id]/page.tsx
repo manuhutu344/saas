@@ -7,6 +7,7 @@ import TransformedImage from "@/components/shared/TransformedImage";
 import { Button } from "@/components/ui/button";
 import { getImageById } from "@/lib/actions/image.action";
 import { getImageSize } from "@/lib/utils";
+import { DeleteConfirmation } from "@/components/shared/DeleteConfirmation";
 
 const ImageDetails = async ({ params: { id } }: SearchParamProps) => {
   const { userId } = auth();
@@ -86,9 +87,10 @@ const ImageDetails = async ({ params: { id } }: SearchParamProps) => {
           <div className="mt-4 space-y-4">
             <Button asChild type="button" className="submit-button capitalize">
               <Link href={`/transformations/${image._id}/update`}>
-                Update Image
+                Update Gambar
               </Link>
             </Button>
+            <DeleteConfirmation imageId={image._id} />
           </div>
         )}
       </section>
